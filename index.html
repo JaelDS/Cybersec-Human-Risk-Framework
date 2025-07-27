@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Phishing Detection Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .difficulty-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .difficulty-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-dot.active {
+            background: #f39c12;
+            transform: scale(1.2);
+        }
+
+        .warning-banner {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .scenario-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .scenario-counter {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .email-client {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .email-toolbar {
+            background: #e9ecef;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9em;
+        }
+
+        .email-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .email-header-line {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .email-from {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .email-content {
+            padding: 30px;
+            background: white;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .company-logo {
+            max-height: 60px;
+            max-width: 200px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #0056b3;
+        }
+
+        .cta-button.green {
+            background: #28a745;
+        }
+
+        .cta-button.green:hover {
+            background: #1e7e34;
+        }
+
+        .cta-button.orange {
+            background: #fd7e14;
+        }
+
+        .cta-button.orange:hover {
+            background: #e8590c;
+        }
+
+        .decision-panel {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .decision-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .decision-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .decision-btn.click {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .decision-btn.click:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .decision-btn.report {
+            background: #dc3545;
+            color: white;
+        }
+
+        .decision-btn.report:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feedback-modal.show {
+            display: flex;
+        }
+
+        .feedback-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 20px;
+            position: relative;
+        }
+
+        .feedback-content.success {
+            border-left: 5px solid #28a745;
+        }
+
+        .feedback-content.warning {
+            border-left: 5px solid #ffc107;
+        }
+
+        .feedback-content.danger {
+            border-left: 5px solid #dc3545;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .alert-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .next-scenario-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+
+        .next-scenario-btn:hover {
+            background: #545b62;
+        }
+
+        .scenario-content {
+            display: none;
+        }
+
+        .scenario-content.active {
+            display: block;
+        }
+
+        .email-metadata {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .decision-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .decision-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .score-display {
+                position: static;
+                margin: 20px 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="score-display">
+    <div>Scenario: <span id="currentScenario">1</span>/9</div>
+    <div>Score: <span id="score">0</span>/9</div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>🎯 Advanced Phishing Detection Training</h1>
+        <p>Real-world scenarios with increasing difficulty levels</p>
+        <div class="difficulty-indicator">
+            <div class="difficulty-dot active" title="Easy"></div>
+            <div class="difficulty-dot" title="Medium"></div>
+            <div class="difficulty-dot" title="Hard"></div>
+            <div class="difficulty-dot" title="Very Hard"></div>
+            <div class="difficulty-dot" title="Legitimate"></div>
+            <div class="difficulty-dot" title="Expert"></div>
+            <div class="difficulty-dot" title="SMS"></div>
+            <div class="difficulty-dot" title="Website"></div>
+            <div class="difficulty-dot" title="Voice"></div>
+        </div>
+    </div>
+
+    <div class="warning-banner">
+        ⚠️ TRAINING ENVIRONMENT - Make your decision: Click the link or Report as suspicious
+    </div>
+
+    <div class="main-content">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- Scenario 1: Easy - Obviously fake PayPal -->
+        <div class="scenario-content active" id="scenario-1">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 1 - Difficulty: Easy</div>
+                <h2>Account Security Alert</h2>
+            </div>
+
+            <div class="email-client">
+                <div class="email-toolbar">
+                    📧 Email Client - Inbox
+                </div>
+
+                <div class="email-header">
+                    <div class="email-header-line"><span class="email-from">From:</span> security@paypaI-support.com</div>
+                    <div class="email-header-line"><span>To:</span> you@company.com</div>
+                    <div class="email-subject">Subject: Your PayPal Account Has Been Limited</div>
+                    <div class="email-header-line"><span>Date:</span> Today, 2:45 PM</div>
+                </div>
+
+                <div class="email-content">
+                    <div class="logo-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 170 48" style="height: 40px; width: auto;"><path fill="#003087" d="M62.56 28.672a10.111 10.111 0 009.983-8.56c.78-4.967-3.101-9.303-8.6-9.303H55.08a.689.689 0 00-.69.585l-3.95 25.072a.643.643 0 00.634.742h4.69a.689.689 0 00.688-.585l1.162-7.365a.689.689 0 01.689-.586h4.257zm3.925-8.786c-.29 1.836-1.709 3.189-4.425 3.189h-3.474l1.053-6.68h3.411c2.81.006 3.723 1.663 3.435 3.496v-.005zm26.378-1.18H88.41a.69.69 0 00-.69.585l-.144.924s-3.457-3.775-9.575-1.225c-3.51 1.461-5.194 4.48-5.91 6.69 0 0-2.277 6.718 2.87 10.417 0 0 4.771 3.556 10.145-.22l-.093.589a.642.642 0 00.634.742h4.451a.689.689 0 00.69-.585l2.708-17.175a.643.643 0 00-.634-.742zm-6.547 9.492a4.996 4.996 0 01-4.996 4.276 4.513 4.513 0 01-1.397-.205c-1.92-.616-3.015-2.462-2.7-4.462a4.996 4.996 0 015.014-4.277c.474-.005.946.065 1.398.206 1.913.614 3.001 2.46 2.686 4.462h-.005z"/><path fill="#0070E0" d="M126.672 28.672a10.115 10.115 0 009.992-8.56c.779-4.967-3.101-9.303-8.602-9.303h-8.86a.69.69 0 00-.689.585l-3.962 25.079a.637.637 0 00.365.683.64.64 0 00.269.06h4.691a.69.69 0 00.689-.586l1.163-7.365a.688.688 0 01.689-.586l4.255-.007zm3.925-8.786c-.29 1.836-1.709 3.189-4.426 3.189h-3.473l1.054-6.68h3.411c2.808.006 3.723 1.663 3.434 3.496v-.005zm26.377-1.18h-4.448a.69.69 0 00-.689.585l-.146.924s-3.456-3.775-9.574-1.225c-3.509 1.461-5.194 4.48-5.911 6.69 0 0-2.276 6.718 2.87 10.417 0 0 4.772 3.556 10.146-.22l-.093.589a.637.637 0 00.365.683c.084.04.176.06.269.06h4.451a.686.686 0 00.689-.586l2.709-17.175a.657.657 0 00-.148-.518.632.632 0 00-.49-.224zm-6.546 9.492a4.986 4.986 0 01-4.996 4.276 4.513 4.513 0 01-1.399-.205c-1.921-.616-3.017-2.462-2.702-4.462a4.996 4.996 0 014.996-4.277c.475-.005.947.064 1.399.206 1.933.614 3.024 2.46 2.707 4.462h-.005z"/><path fill="#003087" d="M109.205 19.131l-5.367 9.059-2.723-8.992a.69.69 0 00-.664-.492h-4.842a.516.516 0 00-.496.689l4.88 15.146-4.413 7.138a.517.517 0 00.442.794h5.217a.858.858 0 00.741-.418l13.632-22.552a.516.516 0 00-.446-.789h-5.215a.858.858 0 00-.746.417z"/><path fill="#0070E0" d="M161.982 11.387l-3.962 25.079a.637.637 0 00.365.683c.084.04.176.06.269.06h4.689a.688.688 0 00.689-.586l3.963-25.079a.637.637 0 00-.146-.517.645.645 0 00-.488-.225h-4.69a.69.69 0 00-.689.585z"/><path fill="#001C64" d="M37.146 22.26c-1.006 5.735-5.685 10.07-11.825 10.07h-3.898c-.795 0-1.596.736-1.723 1.55l-1.707 10.835c-.099.617-.388.822-1.013.822h-6.27c-.634 0-.784-.212-.689-.837l.72-7.493-7.526-.389c-.633 0-.862-.345-.772-.977l5.135-32.56c.099-.617.483-.882 1.106-.882h13.023c6.269 0 10.235 4.22 10.72 9.692 3.73 2.52 5.474 5.873 4.72 10.168z"/><path fill="#0070E0" d="M12.649 25.075l-1.907 12.133-1.206 7.612a1.034 1.034 0 001.016 1.19h6.622a1.27 1.27 0 001.253-1.072l1.743-11.06a1.27 1.27 0 011.253-1.071h3.898A12.46 12.46 0 0037.617 22.26c.675-4.307-1.492-8.228-5.201-10.165a9.96 9.96 0 01-.12 1.37 12.461 12.461 0 01-12.295 10.54h-6.1a1.268 1.268 0 00-1.252 1.07z"/><path fill="#003087" d="M10.741 37.208H3.03a1.035 1.035 0 01-1.018-1.192L7.208 3.072A1.268 1.268 0 018.46 2H21.7c6.269 0 10.827 4.562 10.72 10.089a11.567 11.567 0 00-5.399-1.287H15.983a1.27 1.27 0 00-1.254 1.071l-2.08 13.202-1.908 12.133z"/></svg>
+                    </div>
+
+                    <h3>We've detected unusual activity</h3>
+
+                    <p>Hello,</p>
+
+                    <p>We've noticed some unusual activity on your PayPal account and have temporarily limited it to protect you.</p>
+
+                    <div class="alert-warning">
+                        <strong>Account Status:</strong> Limited<br>
+                        <strong>Reason:</strong> Suspicious login from unknown device<br>
+                        <strong>Location:</strong> Nigeria (IP: 41.203.72.234)
+                    </div>
+
+                    <p>To restore full access to your account, please verify your information immediately:</p>
+
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button class="cta-button" onclick="showLinkClick(1)">Verify Account Now</button>
+                    </div>
+
+                    <p>If you don't verify within 24 hours, your account may be permanently suspended.</p>
+
+                    <p>Thanks,<br>PayPal Security Team</p>
+
+                    <div class="email-metadata">
+                        PayPal Holdings Inc. | 2211 North First Street, San Jose, CA 95131
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>You received this email. How do you respond?</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(1, 'click')">
+                        🖱️ Click the "Verify Account" link
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(1, 'report')">
+                        🚨 Report as suspicious/phishing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 2: Medium - Microsoft with subtle issues -->
+        <div class="scenario-content" id="scenario-2">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 2 - Difficulty: Medium</div>
+                <h2>Microsoft Security Notification</h2>
+            </div>
+
+            <div class="email-client">
+                <div class="email-toolbar">
+                    📧 Email Client - Inbox
+                </div>
+
+                <div class="email-header">
+                    <div class="email-header-line"><span class="email-from">From:</span> account-security-noreply@microsoft.com</div>
+                    <div class="email-header-line"><span>To:</span> you@company.com</div>
+                    <div class="email-subject">Subject: Microsoft account sign-in</div>
+                    <div class="email-header-line"><span>Date:</span> Today, 11:22 AM</div>
+                </div>
+
+                <div class="email-content">
+                    <div class="logo-container">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 20px; height: 20px;">
+                                <div style="background: #f25022; width: 9px; height: 9px;"></div>
+                                <div style="background: #7fba00; width: 9px; height: 9px;"></div>
+                                <div style="background: #00a4ef; width: 9px; height: 9px;"></div>
+                                <div style="background: #ffb900; width: 9px; height: 9px;"></div>
+                            </div>
+                            <span style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 20px; font-weight: 400; color: #5e5e5e;">Microsoft</span>
+                        </div>
+                    </div>
+
+                    <h3>New sign-in to your account</h3>
+
+                    <p>Hi,</p>
+
+                    <p>We noticed a new sign-in to your Microsoft account <strong>you@company.com</strong> on a device we don't recognize.</p>
+
+                    <div class="alert-info">
+                        <strong>Device:</strong> Chrome on Android<br>
+                        <strong>Location:</strong> San Francisco, CA, United States<br>
+                        <strong>Time:</strong> November 15, 2024, 11:15 AM PST<br>
+                        <strong>IP address:</strong> 208.67.222.222
+                    </div>
+
+                    <p>If this was you, you can safely ignore this email.</p>
+
+                    <p>If this wasn't you, your account may have been compromised. Please secure your account:</p>
+
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button class="cta-button" onclick="showLinkClick(2)">Review recent activity</button>
+                    </div>
+
+                    <p>You can also visit the Microsoft account security page to review all activity and update your security info.</p>
+
+                    <p>Thanks,<br>The Microsoft account team</p>
+
+                    <div class="email-metadata">
+                        Microsoft Corporation, One Microsoft Way, Redmond, WA 98052, USA<br>
+                        <a href="#" style="color: #0078d4;">Privacy statement</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>This looks like a legitimate Microsoft security notification. How do you respond?</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(2, 'click')">
+                        🖱️ Click "Review recent activity"
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(2, 'report')">
+                        🚨 Report as suspicious/phishing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 3: Hard - Very convincing GitHub -->
+        <div class="scenario-content" id="scenario-3">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 3 - Difficulty: Hard</div>
+                <h2>GitHub Security Alert</h2>
+            </div>
+
+            <div class="email-client">
+                <div class="email-toolbar">
+                    📧 Email Client - Inbox
+                </div>
+
+                <div class="email-header">
+                    <div class="email-header-line"><span class="email-from">From:</span> noreply@github.com</div>
+                    <div class="email-header-line"><span>To:</span> you@company.com</div>
+                    <div class="email-subject">Subject: [GitHub] Please verify your device</div>
+                    <div class="email-header-line"><span>Date:</span> Today, 3:17 PM</div>
+                </div>
+
+                <div class="email-content">
+                    <div class="logo-container">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 640 640"><path d="M319.988 7.973C143.293 7.973 0 151.242 0 327.96c0 141.392 91.678 261.298 218.826 303.63 16.004 2.964 21.886-6.957 21.886-15.414 0-7.63-.319-32.835-.449-59.552-89.032 19.359-107.8-37.772-107.8-37.772-14.552-36.993-35.529-46.831-35.529-46.831-29.032-19.879 2.209-19.442 2.209-19.442 32.126 2.245 49.04 32.954 49.04 32.954 28.56 48.922 74.883 34.76 93.131 26.598 2.882-20.681 11.15-34.807 20.315-42.803-71.08-8.067-145.797-35.516-145.797-158.14 0-34.926 12.52-63.485 32.965-85.88-3.33-8.078-14.291-40.606 3.083-84.674 0 0 26.87-8.61 88.029 32.8 25.512-7.075 52.878-10.642 80.056-10.76 27.2.118 54.614 3.673 80.162 10.76 61.076-41.386 87.922-32.8 87.922-32.8 17.398 44.08 6.485 76.631 3.154 84.675 20.516 22.394 32.93 50.953 32.93 85.879 0 122.907-74.883 149.93-146.117 157.856 11.481 9.921 21.733 29.398 21.733 59.233 0 42.792-.366 77.28-.366 87.804 0 8.516 5.764 18.473 21.992 15.354 127.076-42.354 218.637-162.274 218.637-303.582 0-176.695-143.269-319.988-320-319.988l-.023.107z"/></svg>
+                            <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 600; color: #24292e;">GitHub</span>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #24292e;">Device verification required</h3>
+
+                    <p>Hi there,</p>
+
+                    <p>We detected a sign-in to your GitHub account from a new device. To keep your account secure, please verify this device.</p>
+
+                    <div class="alert-info" style="background: #f6f8fa; border-color: #d0d7de; color: #24292f;">
+                        <strong>Device:</strong> Firefox 119.0 on Windows 10<br>
+                        <strong>Location:</strong> Seattle, WA, United States<br>
+                        <strong>Time:</strong> November 15, 2024 at 3:12 PM PST<br>
+                        <strong>IP:</strong> 52.25.186.181 (Amazon AWS)
+                    </div>
+
+                    <p>If this was you, please verify the device to continue using GitHub normally:</p>
+
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button class="cta-button green" onclick="showLinkClick(3)">Verify device</button>
+                    </div>
+
+                    <p>If this wasn't you, please <a href="#" style="color: #0969da;">secure your account</a> immediately and contact our support team.</p>
+
+                    <p>For your security, we'll automatically log out all sessions if this device isn't verified within 24 hours.</p>
+
+                    <p>Best,<br>The GitHub Team</p>
+
+                    <div class="email-metadata">
+                        GitHub, Inc. | 88 Colin P Kelly Jr Street, San Francisco, CA 94107<br>
+                        You can <a href="#" style="color: #0969da;">unsubscribe</a> from these emails in your settings.
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>This appears to be a legitimate GitHub security notification with proper formatting and details.</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(3, 'click')">
+                        🖱️ Click "Verify device"
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(3, 'report')">
+                        🚨 Report as suspicious/phishing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 4: Very Hard - Almost perfect Apple -->
+        <div class="scenario-content" id="scenario-4">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 4 - Difficulty: Very Hard</div>
+                <h2>Apple ID Security Alert</h2>
+            </div>
+
+            <div class="email-client">
+                <div class="email-toolbar">
+                    📧 Email Client - Inbox
+                </div>
+
+                <div class="email-header">
+                    <div class="email-header-line"><span class="email-from">From:</span> appleid@id.apple.com</div>
+                    <div class="email-header-line"><span>To:</span> you@company.com</div>
+                    <div class="email-subject">Subject: Your Apple ID was used to sign in to iCloud on a Mac</div>
+                    <div class="email-header-line"><span>Date:</span> Today, 7:33 PM</div>
+                </div>
+
+                <div class="email-content">
+                    <div class="logo-container">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="24" viewBox="0 0 20 24" fill="#333">
+                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13.83 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                                </svg>
+                            </div>
+                            <span style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 400; color: #1d1d1f;">Apple ID</span>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #1d1d1f;">Sign-In Notification</h3>
+
+                    <p>Your Apple ID (<strong>you@company.com</strong>) was used to sign in to iCloud on a Mac.</p>
+
+                    <div class="alert-info" style="background: #f5f5f7; border-color: #d2d2d7; color: #1d1d1f;">
+                        <strong>Date and Time:</strong> November 15, 2024, 7:28 PM PST<br>
+                        <strong>Device:</strong> Mac<br>
+                        <strong>Operating System:</strong> macOS Sonoma<br>
+                        <strong>Browser:</strong> Safari<br>
+                        <strong>Approximate Location:</strong> Portland, OR, United States
+                    </div>
+
+                    <p>If the information above looks familiar, you can ignore this email.</p>
+
+                    <p>If you have not signed in to iCloud recently and believe someone may have accessed your account, you can take steps to secure it.</p>
+
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button class="cta-button" style="background: #007aff;" onclick="showLinkClick(4)">Secure Your Account</button>
+                    </div>
+
+                    <p style="font-size: 0.9em; color: #666;">Apple ID security is designed to help keep your information safe. Apple will never ask you to log in to any website, or to tap Accept in the two-factor authentication dialog, or to provide your password, device passcode, or two-factor authentication code or to enter it into any website.</p>
+
+                    <p>Best regards,<br>Apple Support</p>
+
+                    <div class="email-metadata" style="color: #86868b;">
+                        Apple Inc.<br>
+                        Copyright © 2024 Apple Inc. All rights reserved.<br>
+                        Apple, the Apple logo, and iCloud are trademarks of Apple Inc.
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>This looks like a standard Apple ID sign-in notification with proper branding and format.</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(4, 'click')">
+                        🖱️ Click "Secure Your Account"
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(4, 'report')">
+                        🚨 Report as suspicious/phishing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 5: Legitimate - Real Slack notification -->
+        <div class="scenario-content" id="scenario-5">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 5 - Test Case: Legitimate Email</div>
+                <h2>Slack Workspace Invitation</h2>
+            </div>
+
+            <div class="email-client">
+                <div class="email-toolbar">
+                    📧 Email Client - Inbox
+                </div>
+
+                <div class="email-header">
+                    <div class="email-header-line"><span class="email-from">From:</span> feedback@slack.com</div>
+                    <div class="email-header-line"><span>To:</span> you@company.com</div>
+                    <div class="email-subject">Subject: You've been invited to join TechCorp workspace</div>
+                    <div class="email-header-line"><span>Date:</span> Today, 4:52 PM</div>
+                </div>
+
+                <div class="email-content">
+                    <div class="logo-container">
+                        <img src="./assets/img/slack.png" alt="Slack" style="height: 40px; width: auto;">
+                    </div>
+
+                    <h3 style="color: #4a154b;">You're invited!</h3>
+
+                    <p>Hi there,</p>
+
+                    <p><strong>Sarah Johnson</strong> (sarah.johnson@techcorp.com) has invited you to join the <strong>TechCorp</strong> workspace on Slack.</p>
+
+                    <div class="alert-info" style="background: #f8f8f8; border-color: #e1e1e1; color: #1d1c1d;">
+                        <strong>Workspace:</strong> TechCorp<br>
+                        <strong>Invited by:</strong> Sarah Johnson<br>
+                        <strong>Your email:</strong> you@company.com<br>
+                        <strong>Invitation sent:</strong> November 15, 2024
+                    </div>
+
+                    <p>TechCorp uses Slack to communicate as a team. You'll be able to send messages, share files, and collaborate with your colleagues.</p>
+
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button class="cta-button green" onclick="showLinkClick(5)">Join TechCorp</button>
+                    </div>
+
+                    <p>This invitation will expire in 30 days. If you have any questions, you can contact Sarah Johnson directly.</p>
+
+                    <p>Happy collaborating!<br>The Slack Team</p>
+
+                    <div class="email-metadata">
+                        Slack Technologies, LLC | 500 Howard Street, San Francisco, CA 94105<br>
+                        <a href="#" style="color: #1264a3;">Privacy Policy</a> | <a href="#" style="color: #1264a3;">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>You received this invitation to join a workplace Slack. The sender appears to be from your company.</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(5, 'click')">
+                        🖱️ Click "Join TechCorp"
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(5, 'report')">
+                        🚨 Report as suspicious/phishing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 6: Expert - Nearly impossible to detect -->
+        <div class="scenario-content" id="scenario-6">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 6 - Difficulty: Expert</div>
+                <h2>Dropbox Security Alert</h2>
+            </div>
+
+            <div class="email-client">
+                <div class="email-toolbar">
+                    📧 Email Client - Inbox
+                </div>
+
+                <div class="email-header">
+                    <div class="email-header-line"><span class="email-from">From:</span> no-reply@dropbox.com</div>
+                    <div class="email-header-line"><span>To:</span> you@company.com</div>
+                    <div class="email-subject">Subject: New device connected to your Dropbox</div>
+                    <div class="email-header-line"><span>Date:</span> Today, 9:41 PM</div>
+                </div>
+
+                <div class="email-content">
+                    <div class="logo-container">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1333.34 1133.07" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" style="width: 24px; height: 20px;"><path d="M667.53 212.92L333.76 425.84l333.77 212.92-333.77 212.92L0 637.61l333.76-212.92L0 212.92 333.76 0l333.77 212.92zM332.04 920.15L665.8 707.23l333.76 212.92-333.76 212.92-333.76-212.92zM667.53 637.6l333.76-212.92-333.76-211.77L999.57-.01l333.77 212.92-333.77 212.92 333.77 212.92-333.77 212.92L667.53 637.6z" fill="#0061ff" fill-rule="nonzero"/></svg>
+                            <span style="font-family: 'Atlas Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 18px; font-weight: 500; color: #0d2481;">Dropbox</span>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #0d2481;">New device connected</h3>
+
+                    <p>Hi,</p>
+
+                    <p>We wanted to let you know that a new device was connected to your Dropbox account.</p>
+
+                    <div class="alert-info" style="background: #f7f9fc; border-color: #b7c5d1; color: #3d464d;">
+                        <strong>Device:</strong> Chrome 119 on Ubuntu Linux<br>
+                        <strong>Location:</strong> Austin, TX, United States<br>
+                        <strong>Time:</strong> November 15, 2024 at 9:35 PM CST<br>
+                        <strong>IP address:</strong> 198.252.206.25
+                    </div>
+
+                    <p>If this was you, no action is needed.</p>
+
+                    <p>If you don't recognize this device, we recommend securing your account immediately. You can review all connected devices and remove any you don't recognize.</p>
+
+                    <div style="text-align: center; margin: 25px 0;">
+                        <button class="cta-button" style="background: #0061ff;" onclick="showLinkClick(6)">Review connected devices</button>
+                    </div>
+
+                    <p>You can also enable two-step verification for additional security.</p>
+
+                    <p>Thanks,<br>The Dropbox Team</p>
+
+                    <div class="email-metadata">
+                        Dropbox, Inc. | 1800 Owens Street, San Francisco, CA 94158<br>
+                        This email was sent to you@company.com. <a href="#" style="color: #0061ff;">Unsubscribe</a> | <a href="#" style="color: #0061ff;">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>This appears to be a standard Dropbox security notification with all the proper elements.</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(6, 'click')">
+                        🖱️ Click "Review connected devices"
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(6, 'report')">
+                        🚨 Report as suspicious/phishing
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 7: SMS Phishing - Package Delivery -->
+        <div class="scenario-content" id="scenario-7">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 7 - SMS Phishing</div>
+                <h2>Text Message Alert</h2>
+            </div>
+
+            <div style="max-width: 400px; margin: 0 auto; background: #000; border-radius: 25px; padding: 20px; color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 14px;">
+                    <div style="display: flex; gap: 5px;">
+                        <div style="width: 4px; height: 4px; background: white; border-radius: 50%;"></div>
+                        <div style="width: 4px; height: 4px; background: white; border-radius: 50%;"></div>
+                        <div style="width: 4px; height: 4px; background: white; border-radius: 50%;"></div>
+                    </div>
+                    <div>📶 100%</div>
+                </div>
+
+                <div style="text-align: center; font-size: 16px; font-weight: 600; margin-bottom: 20px;">Messages</div>
+
+                <div style="background: #1c1c1e; border-radius: 15px; padding: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div style="font-weight: 600;">UPS</div>
+                        <div style="font-size: 12px; color: #8e8e93;">Now</div>
+                    </div>
+                    <div style="font-size: 14px; line-height: 1.4; color: #ffffff;">
+                        📦 UPS: Your package delivery failed. Address incomplete. Reschedule now to avoid return to sender:
+                        <span style="color: #007aff; text-decoration: underline; cursor: pointer;" onclick="showLinkClick(7)">bit.ly/ups-redelivery-3x7k9</span>
+                        <br><br>
+                        <span style="font-size: 12px; color: #8e8e93;">
+                            Fee: $1.99 | Package #1Z999AA1234567890
+                            </span>
+                    </div>
+                </div>
+
+                <div style="background: #1c1c1e; border-radius: 15px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div style="font-weight: 600;">Mom</div>
+                        <div style="font-size: 12px; color: #8e8e93;">2 min ago</div>
+                    </div>
+                    <div style="font-size: 14px; color: #ffffff;">Did you get my package today?</div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>You received this text message about a package delivery failure. How do you respond?</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(7, 'click')">
+                        📱 Click the link to reschedule
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(7, 'report')">
+                        🚨 Report as suspicious/spam
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 8: Fake Website - Banking Login -->
+        <div class="scenario-content" id="scenario-8">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 8 - Fake Website</div>
+                <h2>Banking Website Login</h2>
+            </div>
+
+            <div style="border: 2px solid #ddd; border-radius: 10px; overflow: hidden; background: white;">
+                <div style="background: #f5f5f5; padding: 10px 15px; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 10px; font-family: monospace; font-size: 14px;">
+                    <div style="display: flex; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #ff5f57; border-radius: 50%;"></div>
+                        <div style="width: 12px; height: 12px; background: #ffbd2e; border-radius: 50%;"></div>
+                        <div style="width: 12px; height: 12px; background: #28ca42; border-radius: 50%;"></div>
+                    </div>
+                    <div style="background: white; padding: 5px 15px; border-radius: 15px; flex-grow: 1;">
+                        🔒 https://wellsfargo-secure.com/signin
+                    </div>
+                </div>
+
+                <div style="padding: 40px; text-align: center;">
+                    <div style="margin-bottom: 30px;">
+                        <div style="display: inline-block; background: #d71e2b; color: white; padding: 15px 30px; font-size: 24px; font-weight: bold; border-radius: 5px;">
+                            Wells Fargo
+                        </div>
+                    </div>
+
+                    <h2 style="color: #333; margin-bottom: 10px;">Sign On</h2>
+                    <p style="color: #666; margin-bottom: 30px;">Please sign on to access your accounts</p>
+
+                    <div style="max-width: 400px; margin: 0 auto; text-align: left;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Username</label>
+                            <input type="text" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;" placeholder="Enter your username">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Password</label>
+                            <input type="password" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;" placeholder="Enter your password">
+                        </div>
+
+                        <button class="cta-button" style="width: 100%; background: #d71e2b; font-size: 16px;" onclick="showLinkClick(8)">
+                            Sign On
+                        </button>
+
+                        <div style="text-align: center; margin-top: 20px;">
+                            <a href="#" style="color: #0073e6; font-size: 14px;">Forgot Username or Password?</a>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+                        © 2024 Wells Fargo Bank, N.A. All rights reserved. Member FDIC
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>You clicked a link from an email and arrived at this Wells Fargo login page. How do you proceed?</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(8, 'click')">
+                        🔑 Enter your login credentials
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(8, 'report')">
+                        🚨 Report as suspicious/fake website
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 9: Voice Call Phishing -->
+        <div class="scenario-content" id="scenario-9">
+            <div class="scenario-header">
+                <div class="scenario-counter">Scenario 9 - Voice Call (Vishing)</div>
+                <h2>Incoming Phone Call</h2>
+            </div>
+
+            <div style="max-width: 400px; margin: 0 auto; background: linear-gradient(135deg, #000, #333); border-radius: 25px; padding: 30px; color: white; text-align: center;">
+                <div style="font-size: 14px; margin-bottom: 20px; opacity: 0.8;">Incoming call</div>
+
+                <div style="width: 100px; height: 100px; background: #666; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+                    🏦
+                </div>
+
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Bank of America</div>
+                <div style="font-size: 16px; margin-bottom: 5px; color: #ccc;">Fraud Department</div>
+                <div style="font-size: 14px; color: #999; margin-bottom: 30px;">+1 (800) 432-1000</div>
+
+                <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin-bottom: 30px; text-align: left; font-size: 14px; line-height: 1.5;">
+                    <strong>Caller says:</strong><br><br>
+                    "Hello, this is Sarah from Bank of America's Fraud Department. We've detected suspicious activity on your account ending in 4829. Someone attempted to make a $2,400 purchase in Miami, Florida.
+                    <br><br>
+                    For your security, we've temporarily frozen your account. I can help you verify your identity and restore access right now.
+                    <br><br>
+                    Can you please confirm your full account number and the CVV code on your card so I can verify your identity?"
+                </div>
+
+                <div style="display: flex; gap: 20px; justify-content: center;">
+                    <div style="width: 60px; height: 60px; background: #ff3b30; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer;" onclick="showCallResponse(9, 'hangup')">
+                        📞
+                    </div>
+                    <div style="width: 60px; height: 60px; background: #34c759; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer;" onclick="showCallResponse(9, 'answer')">
+                        📞
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; font-size: 12px; color: #999;">
+                    <span style="color: #ff3b30;">Decline</span> &nbsp;&nbsp;&nbsp;&nbsp; <span style="color: #34c759;">Answer & Provide Info</span>
+                </div>
+            </div>
+
+            <div class="decision-panel">
+                <h3>What would you do?</h3>
+                <p>You receive this call claiming to be from your bank's fraud department asking for account verification.</p>
+
+                <div class="decision-buttons">
+                    <button class="decision-btn click" onclick="makeDecision(9, 'click')">
+                        📞 Provide the requested information
+                    </button>
+                    <button class="decision-btn report" onclick="makeDecision(9, 'report')">
+                        🚨 Hang up and call bank directly
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: #e8f5e8; border-radius: 10px; border-left: 5px solid #28a745;">
+            <h3>🎯 Key Takeaways</h3>
+            <ul style="margin: 15px 0;">
+                <li><strong>Multi-platform awareness:</strong> Attackers use email, SMS, websites, and phone calls</li>
+                <li><strong>Always verify the sender:</strong> Check domains, phone numbers, and URLs carefully</li>
+                <li><strong>Be suspicious of urgency:</strong> Phishing attacks often create false time pressure</li>
+                <li><strong>Never provide sensitive information:</strong> Real companies don't ask for passwords via unsolicited contact</li>
+                <li><strong>Verify independently:</strong> Contact companies through official channels to confirm suspicious communications</li>
+                <li><strong>Trust your instincts:</strong> If something feels wrong, it probably is</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="feedback-modal" id="feedbackModal">
+    <div class="feedback-content" id="feedbackContent">
+        <button class="close-btn" onclick="closeFeedback()">&times;</button>
+        <div id="feedbackBody"></div>
+        <button class="next-scenario-btn" onclick="nextScenario()">Next Scenario</button>
+    </div>
+</div>
+
+<script>
+    const scenarios = [
+        {
+            id: 1,
+            isPhishing: true,
+            difficulty: "Easy",
+            issues: ["Domain typo (paypaI with capital I instead of l)", "Urgency tactics", "Suspicious origin country", "Generic threats"],
+            explanation: "This was a phishing attempt. The domain 'paypaI-support.com' uses a capital 'I' instead of lowercase 'l' in PayPal - a classic typosquatting technique."
+        },
+        {
+            id: 2,
+            isPhishing: true,
+            difficulty: "Medium",
+            issues: ["Real Microsoft domain BUT suspicious redirect", "Timing mismatch", "Generic device info"],
+            explanation: "This was a sophisticated phishing attempt. While it appears to come from Microsoft, the link would redirect to a fake site. The timing shows 'today' but references November 15, 2024."
+        },
+        {
+            id: 3,
+            isPhishing: true,
+            difficulty: "Hard",
+            issues: ["Perfect formatting", "Real GitHub domain spoofed", "Automated logout threat"],
+            explanation: "This was a very sophisticated phishing attempt. Everything looks legitimate, but GitHub rarely requires device verification via email links."
+        },
+        {
+            id: 4,
+            isPhishing: true,
+            difficulty: "Very Hard",
+            issues: ["Nearly perfect Apple formatting", "Subtle pressure tactics", "Professional appearance"],
+            explanation: "This was an expert-level phishing attempt. The only real indicator is that Apple typically sends these notifications through their dedicated system, not email."
+        },
+        {
+            id: 5,
+            isPhishing: false,
+            difficulty: "Legitimate",
+            issues: [],
+            explanation: "This was actually a legitimate Slack invitation. While it's good to be cautious, this email has all the hallmarks of genuine Slack communications."
+        },
+        {
+            id: 6,
+            isPhishing: true,
+            difficulty: "Expert",
+            issues: ["Perfect branding", "Realistic details", "Only detectable by direct verification"],
+            explanation: "This was an expert-level phishing attempt. Nearly impossible to detect without verifying directly with Dropbox. The only subtle hint is the late-night timing."
+        },
+        {
+            id: 7,
+            isPhishing: true,
+            difficulty: "SMS Phishing",
+            issues: ["Shortened URL to hide destination", "Urgent delivery deadline", "Requests payment for redelivery", "Generic tracking number"],
+            explanation: "This was an SMS phishing attempt. Real UPS messages come from verified numbers and don't use shortened URLs or request small fees for redelivery."
+        },
+        {
+            id: 8,
+            isPhishing: true,
+            difficulty: "Fake Website",
+            issues: ["Wrong domain (wellsfargo-secure.com vs wellsfargo.com)", "Suspicious URL structure", "Phishing site design"],
+            explanation: "This was a fake banking website. The domain 'wellsfargo-secure.com' is not the real Wells Fargo domain. Always type bank URLs directly or use bookmarks."
+        },
+        {
+            id: 9,
+            isPhishing: true,
+            difficulty: "Voice Phishing",
+            issues: ["Unsolicited call requesting sensitive info", "Pressure to act immediately", "Asking for full account details"],
+            explanation: "This was a voice phishing (vishing) attempt. Banks never call asking for full account numbers or CVV codes. They already have this information."
+        }
+    ];
+
+    let currentScenario = 1;
+    let score = 0;
+    let completed = new Set();
+
+    function makeDecision(scenarioId, decision) {
+        const scenario = scenarios[scenarioId - 1];
+        let isCorrect = false;
+        let feedbackClass = 'danger';
+        let title = '';
+        let content = '';
+
+        if (scenario.isPhishing && decision === 'report') {
+            // Correctly identified phishing
+            isCorrect = true;
+            feedbackClass = 'success';
+            title = '🎉 Excellent Decision!';
+            content = `
+                    <h3>${title}</h3>
+                    <p><strong>You correctly identified this as a phishing attempt!</strong></p>
+                    <p>${scenario.explanation}</p>
+                    <div class="alert-info">
+                        <h4>Key Red Flags:</h4>
+                        <ul>
+                            ${scenario.issues.map(issue => `<li>${issue}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <p><strong>What to do next:</strong> Report this to your IT security team and delete the email.</p>
+                `;
+        } else if (!scenario.isPhishing && decision === 'click') {
+            // Correctly identified legitimate email
+            isCorrect = true;
+            feedbackClass = 'success';
+            title = '✅ Correct Decision!';
+            content = `
+                    <h3>${title}</h3>
+                    <p><strong>This was indeed a legitimate email.</strong></p>
+                    <p>${scenario.explanation}</p>
+                    <p><strong>Good practice:</strong> When in doubt about legitimate-looking emails, you can always verify by going directly to the company's website or calling them.</p>
+                `;
+        } else if (!scenario.isPhishing && decision === 'report') {
+            // Over-cautious but not wrong
+            isCorrect = true; // We'll count this as correct
+            feedbackClass = 'warning';
+            title = '⚠️ Better Safe Than Sorry!';
+            content = `
+                    <h3>${title}</h3>
+                    <p><strong>This was actually a legitimate email, but your caution is commendable!</strong></p>
+                    <p>${scenario.explanation}</p>
+                    <p><strong>Key takeaway:</strong> It's always better to err on the side of caution. When unsure, reporting suspicious emails is the right approach. Your security team would rather investigate a false positive than miss a real threat.</p>
+                `;
+        } else if (scenario.isPhishing && decision === 'click') {
+            // Fell for phishing
+            feedbackClass = 'danger';
+            title = '🚨 Phishing Attack Successful';
+            content = `
+                    <h3>${title}</h3>
+                    <p><strong>Unfortunately, you fell for a phishing attempt.</strong></p>
+                    <p>In a real scenario, clicking this link could have led to:</p>
+                    <ul>
+                        <li>Credential theft (username/password)</li>
+                        <li>Malware installation</li>
+                        <li>Account compromise</li>
+                        <li>Data breach</li>
+                    </ul>
+                    <p>${scenario.explanation}</p>
+                    <div class="alert-danger">
+                        <h4>What made this suspicious:</h4>
+                        <ul>
+                            ${scenario.issues.map(issue => `<li>${issue}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <p><strong>Learning point:</strong> Always verify unexpected security emails by going directly to the company's official website.</p>
+                `;
+        }
+
+        if (isCorrect && !completed.has(scenarioId)) {
+            score++;
+            completed.add(scenarioId);
+            updateScore();
+        }
+
+        showFeedback(feedbackClass, content);
+    }
+
+    function showLinkClick(scenarioId) {
+        const scenario = scenarios[scenarioId - 1];
+        if (scenario.isPhishing) {
+            alert('🚨 PHISHING LINK DETECTED!\n\nThis would have taken you to a malicious website designed to steal your credentials. In this training environment, the link is blocked for your safety.');
+        } else {
+            alert('✅ This would take you to the legitimate company website. Always verify URLs before clicking!');
+        }
+    }
+
+    function showCallResponse(scenarioId, action) {
+        if (action === 'hangup') {
+            alert('✅ Good decision! You hung up and will call the bank directly using the number on your card.');
+        } else {
+            alert('🚨 DANGER! You provided sensitive information to a scammer. This would result in account compromise in a real scenario.');
+        }
+    }
+
+    function showFeedback(type, content) {
+        document.getElementById('feedbackContent').className = `feedback-content ${type}`;
+        document.getElementById('feedbackBody').innerHTML = content;
+        document.getElementById('feedbackModal').classList.add('show');
+    }
+
+    function closeFeedback() {
+        document.getElementById('feedbackModal').classList.remove('show');
+    }
+
+    function nextScenario() {
+        closeFeedback();
+        if (currentScenario < 9) {
+            document.getElementById(`scenario-${currentScenario}`).classList.remove('active');
+            currentScenario++;
+            document.getElementById(`scenario-${currentScenario}`).classList.add('active');
+            updateDifficultyIndicator();
+            updateScore();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            showFinalResults();
+        }
+    }
+
+    function updateScore() {
+        document.getElementById('score').textContent = score;
+        document.getElementById('currentScenario').textContent = currentScenario;
+        document.getElementById('progressBar').style.width = ((currentScenario - 1) / 9 * 100) + '%';
+
+        if (score === 9) {
+            setTimeout(() => {
+                alert('🎉 Congratulations! You\'ve completed all training scenarios across multiple attack vectors. You\'re now better equipped to identify various types of phishing attacks!');
+            }, 500);
+        }
+    }
+
+    function updateDifficultyIndicator() {
+        document.querySelectorAll('.difficulty-dot').forEach((dot, index) => {
+            if (index < currentScenario) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    function showFinalResults() {
+        const percentage = Math.round((score / 9) * 100);
+        let resultMessage = '';
+        let resultClass = 'warning';
+
+        if (percentage >= 85) {
+            resultClass = 'success';
+            resultMessage = '🏆 Outstanding! You have excellent phishing detection skills across all attack vectors.';
+        } else if (percentage >= 70) {
+            resultClass = 'success';
+            resultMessage = '👍 Great job! You caught most threats across different platforms.';
+        } else if (percentage >= 50) {
+            resultMessage = '📚 Good effort! Keep practicing with different attack types to improve your skills.';
+        } else {
+            resultClass = 'danger';
+            resultMessage = '⚠️ Consider comprehensive security training. Modern attacks use multiple channels and sophisticated techniques.';
+        }
+
+        const finalContent = `
+                <h2>Multi-Platform Training Complete!</h2>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 3em; margin: 10px 0;">${percentage}%</div>
+                    <div style="font-size: 1.2em;">Final Score: ${score}/9</div>
+                </div>
+                <p>${resultMessage}</p>
+                <h3>Attack Vectors Covered:</h3>
+                <ul>
+                    <li><strong>Email Phishing:</strong> Traditional and sophisticated email attacks</li>
+                    <li><strong>SMS Phishing (Smishing):</strong> Text message-based scams</li>
+                    <li><strong>Fake Websites:</strong> Malicious login pages and spoofed sites</li>
+                    <li><strong>Voice Phishing (Vishing):</strong> Phone-based social engineering</li>
+                </ul>
+                <h3>Key Takeaways:</h3>
+                <ul>
+                    <li><strong>Multi-channel awareness:</strong> Attackers use email, SMS, websites, and phone calls</li>
+                    <li><strong>Verify independently:</strong> Always use official channels to confirm suspicious communications</li>
+                    <li><strong>Domain verification:</strong> Check URLs carefully for typos and suspicious domains</li>
+                    <li><strong>Never provide sensitive info:</strong> Real companies don't ask for passwords or account numbers</li>
+                    <li><strong>Trust your instincts:</strong> When something feels wrong, it probably is</li>
+                </ul>
+                <button class="cta-button" onclick="location.reload()">Start Over</button>
+            `;
+
+        showFeedback(resultClass, finalContent);
+        document.querySelector('.next-scenario-btn').style.display = 'none';
+    }
+
+    // Initialize
+    updateScore();
+    updateDifficultyIndicator();
+</script>
+</body>
+</html>
